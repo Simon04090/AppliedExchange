@@ -38,7 +38,7 @@ apply plugin: 'forge'
 
 version = 1
 group= "com.github.Simon04090.AppliedExchange" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "AppliedExchange"
+archivesBaseName = "[1.7.10]AppliedExchange"
 
 minecraft {
     version = "1.7.10-10.13.4.1448-1.7.10"
@@ -48,7 +48,13 @@ minecraft {
 		runDir = "eclipse"
 	}
 }
-repositories{
+jar {
+	manifest{
+		attributes 'FMLCorePlugin':'com.github.Simon04090.AppliedExchange.core.AppliedExchangeCore'
+		attributes 'FMLCorePluginContainsMod':'true'
+	}
+}
+repositories {
 	ivy {
 		name "Custom stuff"
 		artifactPattern "/ivy/[module]/[revision]/[artifact]-[revision]-[classifier].[ext]"
