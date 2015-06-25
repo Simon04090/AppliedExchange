@@ -8,10 +8,8 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
@@ -47,12 +45,11 @@ public class AppliedExchangeClassTransformer implements IClassTransformer{
 
 	private static void transformItemRepo(ClassNode classNode){
 		final String updateView_CLASS = "appeng.client.me.ItemRepo";
-		final String updateView = "appeng.client.me.ItemRepo.updateView";
+		final String updateView = "updateView";
 		final String updateView_DESC = "()V";
-		Logger.info(updateView_DESC);
-		MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, "updateView", updateView_DESC);
+		MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, updateView, updateView_DESC);
 		if (method != null){
-			Logger.info("Transforming " + method.name);
+			Logger.debug("[Core]Transforming " + method.name);
 			/*
 			 * Find the first two instructions of the else statement (ALOAD,
 			 * GETFIELD)
@@ -64,7 +61,7 @@ public class AppliedExchangeClassTransformer implements IClassTransformer{
 			AbstractInsnNode targetNode = ASMHelper.find(method.instructions, pattern);
 			InsnList toInject = new InsnList();
 			if (targetNode != null){
-				Logger.info("Found targetNode");
+				Logger.debug("[Core]Found targetNode for" + method.name);
 				/*
 				 * Inject before the else statement: else if(SortBy ==
 				 * SortOrder.EMC) { com.github.Simon04090
@@ -73,10 +70,6 @@ public class AppliedExchangeClassTransformer implements IClassTransformer{
 				 * this.view, com.github.Simon04090
 				 * .AppliedExchange.core.EMCSorter.SORT_BY_EMC ); }
 				 */
-				toInject.add(new LdcInsnNode("This is before the else if"));
-				toInject.add(new InsnNode(ICONST_0));
-				toInject.add(new TypeInsnNode(ANEWARRAY, "java/lang/Object"));
-				toInject.add(new MethodInsnNode(INVOKESTATIC, "com/github/Simon04090/AppliedExchange/Logger", "info", "(Ljava/lang/String;[Ljava/lang/Object;)V", false));
 				toInject.add(new VarInsnNode(ALOAD, 7));
 				toInject.add(new FieldInsnNode(GETSTATIC, "appeng/api/config/SortOrder", "EMC", "Lappeng/api/config/SortOrder;"));
 				LabelNode label1 = new LabelNode();
@@ -85,10 +78,6 @@ public class AppliedExchangeClassTransformer implements IClassTransformer{
 				toInject.add(new VarInsnNode(ALOAD, 8));
 				toInject.add(new TypeInsnNode(CHECKCAST, "appeng/api/config/SortDir"));
 				toInject.add(new FieldInsnNode(PUTSTATIC, "com/github/Simon04090/AppliedExchange/core/EMCSorter", "Direction", "Lappeng/api/config/SortDir;"));
-				toInject.add(new LdcInsnNode("Set EMCSorter.Direction"));
-				toInject.add(new InsnNode(ICONST_0));
-				toInject.add(new TypeInsnNode(ANEWARRAY, "java/lang/Object"));
-				toInject.add(new MethodInsnNode(INVOKESTATIC, "com/github/Simon04090/AppliedExchange/Logger", "info", "(Ljava/lang/String;[Ljava/lang/Object;)V", false));
 				toInject.add(new VarInsnNode(ALOAD, 0));
 				toInject.add(new FieldInsnNode(GETFIELD, updateView_CLASS.replace('.', '/'), "view", "Ljava/util/ArrayList;"));
 				toInject.add(new FieldInsnNode(GETSTATIC, "com/github/Simon04090/AppliedExchange/core/EMCSorter", "SORT_BY_EMC", "Ljava/util/Comparator;"));
